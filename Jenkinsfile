@@ -1,21 +1,27 @@
-pipeline{
+pipeline {
     agent any
-    tools {nodejs "NodeJs"}
-    stages{
-        stage("Build"){
-            steps{
+    tools { nodejs "NodeJs" }
+    environment {
+        PORT = "3000"
+    }
+    stages {
+        stage("Build") {
+            steps {
                 nodejs("NodeJs") {
-                    sh 'npm install'
-                    sh 'npm build'
+                    // usa npm ci pra garantir install limpo
+                    sh 'npm ci'
+                    // build gera a pasta .next
+                    sh 'npm run build'
                 }
             }
         }
-        stage("Start"){
-            steps{
+        stage("Start") {
+            steps {
                 nodejs("NodeJs") {
-                    sh 'npm start'
+                    // força o Next a escutar em 0.0.0.0 na porta 3000
+                    sh 'npm run start -- -p $PORT -H 0.0.0.0'
                 }
-                echo "App started successfully"
+                echo "App started successfully on port $PORT"
             }
         }
     }
